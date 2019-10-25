@@ -1,17 +1,27 @@
-import { RUNNING } from './constants'
+import { RUNNING, FAILURE } from './constants'
 
-const NOOP = () => {}
+const NOOP = () => { }
 
 export default class Node {
   nodeType = 'Node'
 
-  constructor ({ run = NOOP, start = NOOP, end = NOOP, ...props }) {
-    this.blueprint = { run, start, end, ...props }
+  constructor({ utilityFn = NOOP, canRun = NOOP, run = NOOP, start = NOOP, end = NOOP, ...props }) {
+    this.blueprint = { utilityFn, canRun, run, start, end, ...props }
   }
 
   run (blackboard, { rerun = false, runData, registryLookUp = x => x, ...config } = {}) {
     if (!rerun) this.blueprint.start(blackboard)
-    const result = this.blueprint.run(blackboard, { ...config, rerun, runData, registryLookUp })
+    let result;
+    if (this.blueprint.canRun && typeof this.blueprint.canRun === "function") {
+      if (this.blueprint.canRun(blackboard)) {
+        result = this.blueprint.run(blackboard, { ...config, rerun, runData, registryLookUp })
+      } else {
+        result = FAILURE;
+      }
+    } else {
+      result = this.blueprint.run(blackboard, { ...config, rerun, runData, registryLookUp })
+    }
+
     if (result !== RUNNING) {
       this.blueprint.end(blackboard)
     }

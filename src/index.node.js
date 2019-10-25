@@ -14,6 +14,7 @@ module.exports = {
   Random: require('./Random').default,
   Decorator: require('./Decorator').default,
   Task: require('./Task').default,
+  UtilitySelector: require('./UtilitySelector').default,
 
   ...require('./constants')
 }

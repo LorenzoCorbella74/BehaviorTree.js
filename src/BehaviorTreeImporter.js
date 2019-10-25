@@ -5,6 +5,7 @@ import Sequence from './Sequence'
 import Task from './Task'
 import AlwaysFailDecorator from './decorators/AlwaysFailDecorator'
 import AlwaysSucceedDecorator from './decorators/AlwaysSucceedDecorator'
+import ConditionDecorator from './decorators/ConditionDecorator';
 import CooldownDecorator from './decorators/CooldownDecorator'
 import InvertDecorator from './decorators/InvertDecorator'
 import LoopDecorator from './decorators/LoopDecorator'
@@ -19,6 +20,7 @@ export default class BehaviorTreeImporter {
     random: Random,
     invert: InvertDecorator,
     fail: AlwaysFailDecorator,
+    condition: ConditionDecorator,
     succeed: AlwaysSucceedDecorator,
     cooldown: CooldownDecorator,
     loop: LoopDecorator
