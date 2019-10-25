@@ -1,11 +1,12 @@
 # BehaviorTree.js
 
-A JavaScript implementation of Behavior Trees. They are useful for implementing AIs. If you need more information about Behavior Trees, look on [GameDevAI](http://aigamedev.com), there is a nice [video about Behavior Trees from Alex Champandard](http://aigamedev.com/open/article/behavior-trees-part1/). There is also a nice read of [Björn Knafla](http://www.altdevblogaday.com/author/bjoern-knafla/) explaining how [explaining how Behavior Trees work](http://www.altdevblogaday.com/2011/02/24/introduction-to-behavior-trees/).
+A JavaScript implementation of Behavior Trees.
 
 ## Features
 
-* The needed: Sequences, Selectors, Tasks
-* The extended: Decorators
+* Sequences, Selectors, Tasks
+* Decorators
+* Utility Selector (choose the node with the highest utility)
 
 ## Installation
 
@@ -52,6 +53,9 @@ Each method of your task receives the blackboard, which you assign when instanti
 ```js
 import { Task, SUCCESS } from 'behaviortree'
 const myTask = new Task({
+  // (optional) this function is called directly before the start method
+  // is called. It allows you to check if a condition is met to run a node
+  canRun: function(blackboard) { return true; },
   // (optional) this function is called directly before the run method
   // is called. It allows you to setup things before starting to run
   // Beware: if task is resumed after calling this.running(), start is not called.
@@ -71,6 +75,7 @@ const myTask = new Task({
 
 The methods:
 
+* `canRun`  - Called before start is called
 * `start`  - Called before run is called. But not if task is resuming after ending with this.running()
 * `end`    - Called after run is called. But not if task finished with this.running()
 * `run`    - Contains the main things you want the task to do
@@ -100,6 +105,39 @@ const mySelector = new Selector({
     // here comes in a list of nodes (Tasks, Sequences or Priorities)
     // as objects or as registered strings
   ]
+})
+```
+### Creating an utility selector
+
+An `Utility Selector` calls the utilityFn of every node and call the one with the highest utility.
+
+```js
+import { UtilitySelector } from 'behaviortree'
+
+BehaviorTree.register(
+  "initAction",
+  new Task({
+    utilityFn:  (actor) => 0.5,
+    run: function(actor, ...p) {
+      actor.initAction();
+      return SUCCESS;
+    }
+  })
+);
+BehaviorTree.register(
+  "secondAction",
+  new Task({
+    utilityFn: () => 0.8,
+    run: function(actor, ...p) {
+      actor.secondAction();
+      return SUCCESS;
+    }
+  })
+);
+
+const mySelector = new UtilitySelector({
+      nodes: ["initAction", "secondAction"]
+    }),
 })
 ```
 
@@ -225,12 +263,20 @@ In this example the following happens: each pass on the `setInterval` (our game 
 
 ### Decorators
 
-Every node can also be a `Decorator`, which wraps a regular (or another decorated) node and either control their value or calling, add some conditions or do something with their returned state. In the `src/decorators` directory you'll find some already implemented decorators for inspiration or use, like an `InvertDecorator` which negates the return value of the decorated node or a `CooldownDecorator` which ensures the node is only called once within a cool down time period.
+Every node can also be a `Decorator`, which wraps a regular (or another decorated) node and either control their value or calling, add some conditions or do something with their returned state. In the `src/decorators` directory you'll find some already implemented decorators for inspiration or use, like an `InvertDecorator` which negates the return value of the decorated node or a `CooldownDecorator` which ensures the node is only called once within a cool down time period or the `ConditionDecorator` which ensures the node is only called when a condition is met.
 
 ```js
 const decoratedSequence = new InvertDecorator({
   node: 'awesome sequence doing stuff'
 })
+
+new ConditionDecorator({
+  config: { condition: ()=> true },
+  node: new Sequence({
+    nodes: ["initAction", "secondAction"]
+  })
+}),
+
 ```
 
 ### Creating own Decorators

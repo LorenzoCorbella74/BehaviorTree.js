@@ -34,7 +34,7 @@ export default class UtilitySelector extends Node {
       }
     });
 
-    // si eegue solo il primo
+    // running only the one with highest utility
     let indexOfMax = findIndexOfMax(utilities);
     let choosenNode = registryLookUp(this.blueprint.nodes[indexOfMax]).blueprint;
     if (!rerun) choosenNode.start(blackboard);

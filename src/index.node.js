@@ -7,6 +7,13 @@ module.exports = {
 
   BehaviorTreeImporter: require('./BehaviorTreeImporter').default,
 
+  InvertDecorator: require('./decorators/InvertDecorator').default,
+  AlwaysFailDecorator: require('./decorators/AlwaysFailDecorator').default,
+  ConditionDecorator: require('./decorators/ConditionDecorator').default,
+  AlwaysSucceedDecorator: require('./decorators/AlwaysSucceedDecorator').default,
+  CooldownDecorator: require('./decorators/CooldownDecorator').default,
+  LoopDecorator: require('./decorators/LoopDecorator').default,
+
   BranchNode: require('./BranchNode').default,
   Node: require('./Node').default,
   Selector: require('./Selector').default,
